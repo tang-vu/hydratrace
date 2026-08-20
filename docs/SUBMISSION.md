@@ -35,7 +35,7 @@ Track 02 — Repos, dependencies and code as graphs; sub-track B — Code graphs
 ## Links
 
 - Public repository: https://github.com/tang-vu/hydratrace
-- Deployed project: not required; local Docker demo documented in README
+- Live project: https://hydratrace.tangvu.dev
 - Demo video: **PASTE UNLISTED YOUTUBE URL HERE**
 - Official submission form: https://forms.gle/WEwqEmmN7Bkp4HyJ6
 

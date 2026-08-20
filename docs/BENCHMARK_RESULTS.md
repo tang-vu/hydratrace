@@ -25,4 +25,3 @@ Static indexing: 692.18 ms; HydraDB ingestion: 548.23 ms; 29 nodes; 57 edges.
 Macro average: lexical Recall@K **0.429**, graph Recall@K **0.952**; lexical Precision@K **0.905**, graph Precision@K **0.569**.
 
 The baseline ranks filename, path, symbol-name, qualified-name, quoted phrase, and token overlap only. Graph retrieval starts from the same text signals and then executes bounded HydraDB traversal. Ties and lexical wins are preserved.
-

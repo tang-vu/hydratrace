@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { benchmarkCases } from "../../../benchmark/cases";
+import { analysisClientId, publicAnalysisGuard } from "../../../core/http/analysis-guard";
+import { sanitizeAnalysisForWeb, sanitizeWebError } from "../../../core/repositories/public-analysis";
 import { repositoryIdSchema, resolveRegisteredRepository } from "../../../core/repositories/registry";
 import { runAnalysis } from "../../../core/service";
 
@@ -15,6 +17,24 @@ const requestSchema = z.object({
 });
 
 export async function POST(request: Request) {
+  const permit = publicAnalysisGuard.tryAcquire(analysisClientId(request));
+  if (!permit.allowed) {
+    return NextResponse.json(
+      {
+        error: permit.reason === "busy"
+          ? "Another analysis is already running. Retry shortly."
+          : "Analysis rate limit reached. Retry after the indicated delay.",
+      },
+      {
+        status: 429,
+        headers: {
+          "Cache-Control": "no-store",
+          "Retry-After": String(permit.retryAfterSeconds ?? 5),
+        },
+      },
+    );
+  }
+
   try {
     const input = requestSchema.parse(await request.json());
     const result = await runAnalysis({
@@ -41,12 +61,15 @@ export async function POST(request: Request) {
         graphOnly: graphHits.filter((file) => !lexicalFiles.has(file)),
       };
     })() : undefined;
-    return NextResponse.json({ ...result, comparison });
+    const publicResult = sanitizeAnalysisForWeb(result, input.repository);
+    return NextResponse.json({ ...publicResult, comparison }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     const validation = error instanceof z.ZodError;
     return NextResponse.json(
-      { error: validation ? error.issues.map((issue) => issue.message).join("; ") : error instanceof Error ? error.message : String(error) },
-      { status: validation ? 400 : 500 },
+      { error: validation ? error.issues.map((issue) => issue.message).join("; ") : sanitizeWebError(error) },
+      { status: validation ? 400 : 500, headers: { "Cache-Control": "no-store" } },
     );
+  } finally {
+    permit.release();
   }
 }

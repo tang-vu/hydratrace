@@ -8,6 +8,8 @@ Filename search can find `applyCoupon`. HydraTrace also finds the aliased pricin
 
 The same verified pipeline is available to coding agents through two local MCP tools, and the web demo can switch from the deterministic ShopFlow story to HydraTrace analyzing its own production source.
 
+**Live demo:** [hydratrace.tangvu.dev](https://hydratrace.tangvu.dev) — a production Next.js process connected to the real local HydraDB container through a dedicated Cloudflare Tunnel. The public API has no fallback graph and accepts only the two server-owned repository IDs shown in the interface.
+
 ![HydraTrace live ShopFlow analysis showing HydraDB graph evidence, ranked impact, and retrieval metrics](public/hydratrace-demo.png)
 
 ## Run the complete demo
@@ -129,6 +131,8 @@ pnpm demo:verify
 ```
 
 Live integration tests cover authenticated write/read, bookmarks, batched idempotent upserts, stale-record synchronization, native paths, malformed queries, invalid authentication, and the explicit no-fallback failure. CI runs the submission-critical checks with the official container.
+
+The public demo is self-hosted because HydraTrace requires a persistent HydraDB container and local repository access. Its Windows startup tasks, loopback-only port boundary, health checks, and recovery procedure are documented in [deployment operations](docs/DEPLOYMENT.md).
 
 ## Security and honest boundaries
 

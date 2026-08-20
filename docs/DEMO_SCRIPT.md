@@ -1,5 +1,7 @@
 # Three-minute demo script
 
+Primary demo URL: `https://hydratrace.tangvu.dev`. Keep the local `pnpm demo` workflow ready as the offline fallback.
+
 Target runtime: **2:48**. Keep the browser at 1440×900 or larger and the terminal at 110% text scaling.
 
 ## Preflight
