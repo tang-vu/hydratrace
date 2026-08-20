@@ -12,6 +12,8 @@ The same verified pipeline is available to coding agents through two local MCP t
 
 ![HydraTrace live ShopFlow analysis showing HydraDB graph evidence, ranked impact, and retrieval metrics](public/hydratrace-demo.png)
 
+The reproducible [three-minute demo script](docs/DEMO_SCRIPT.md) and [verified video-production pipeline](docs/VIDEO_PRODUCTION.md) capture only live HydraDB-backed results. Generated media and production credentials remain local and ignored.
+
 ## Run the complete demo
 
 Prerequisites: Node.js 22+, pnpm 11+, Git, Docker with Compose, and ports `7687`, `8443`, and `9090` available.
