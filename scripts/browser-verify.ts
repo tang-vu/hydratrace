@@ -59,6 +59,15 @@ try {
   await page.getByText("83% / 17%", { exact: true }).waitFor();
   const screenshot = path.resolve("public", "hydratrace-demo.png");
   await page.screenshot({ path: screenshot, fullPage: false });
+  await page.locator("#repository").selectOption("hydratrace");
+  await page.locator("#task").waitFor();
+  if (await page.locator("#task").inputValue() !== "Change HydraDbClient query retry and bookmark behavior") {
+    throw new Error("Dogfood selector did not load its deterministic task.");
+  }
+  await page.getByRole("button", { name: "Analyze blast radius" }).click();
+  await page.locator(".metrics-grid").waitFor({ timeout: 60_000 });
+  await page.getByText("HydraDbClient.query", { exact: true }).first().waitFor({ timeout: 20_000 });
+  const dogfoodGraph = await page.locator(".proof-stats span").first().textContent();
   if (browserErrors.length > 0) throw new Error(`Browser console errors:\n${browserErrors.join("\n")}`);
   const size = statSync(screenshot).size;
   if (size < 100_000) throw new Error(`Screenshot looks incomplete (${size} bytes).`);
@@ -69,6 +78,7 @@ try {
     graphStatus: await page.getByText("HydraDB connected", { exact: true }).textContent(),
     screenshot,
     screenshotBytes: size,
+    dogfoodVerified: dogfoodGraph,
     consoleErrors: browserErrors.length,
   }, null, 2));
 } catch (error) {
@@ -78,4 +88,3 @@ try {
   await browser?.close();
   server.kill("SIGTERM");
 }
-

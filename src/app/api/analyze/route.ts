@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { benchmarkCases } from "../../../benchmark/cases";
+import { repositoryIdSchema, resolveRegisteredRepository } from "../../../core/repositories/registry";
 import { runAnalysis } from "../../../core/service";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 const requestSchema = z.object({
-  repository: z.literal("shopflow"),
+  repository: repositoryIdSchema,
   task: z.string().trim().min(3).max(500),
   budget: z.number().int().min(2_000).max(8_000),
   depth: z.number().int().min(1).max(3),
@@ -17,13 +18,13 @@ export async function POST(request: Request) {
   try {
     const input = requestSchema.parse(await request.json());
     const result = await runAnalysis({
-      repository: "fixtures/shopflow",
+      repository: resolveRegisteredRepository(input.repository),
       task: input.task,
       budget: input.budget,
       depth: input.depth,
       writeArtifacts: true,
     });
-    const benchmarkCase = benchmarkCases.find((item) => item.task === input.task);
+    const benchmarkCase = input.repository === "shopflow" ? benchmarkCases.find((item) => item.task === input.task) : undefined;
     const comparison = benchmarkCase ? (() => {
       const gold = new Set(benchmarkCase.goldFiles.map((item) => item.path));
       const graphFiles = new Set(result.impact.recommendations.map((item) => item.path));
@@ -49,4 +50,3 @@ export async function POST(request: Request) {
     );
   }
 }
-

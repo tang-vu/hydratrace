@@ -30,6 +30,8 @@ jobs:
       - run: pnpm hydra:wait
       - run: pnpm hydra:smoke
       - run: pnpm test:integration
+      - run: pnpm mcp:verify
+      - run: pnpm dogfood:verify
       - run: pnpm demo:verify
       - run: pnpm test:e2e
       - run: pnpm benchmark

@@ -11,6 +11,7 @@ import {
   Network, Play, Search, ShieldCheck, Sparkles, TestTube2, X,
 } from "lucide-react";
 import type { runAnalysis } from "../core/service";
+import { REPOSITORY_CATALOG, repositoryMetadata, type RepositoryId } from "../core/repositories/catalog";
 
 type BaseAnalysis = Awaited<ReturnType<typeof runAnalysis>>;
 type Analysis = BaseAnalysis & { comparison?: { label: string; goldFiles: string[]; graphRecall: number; lexicalRecall: number; graphHits: string[]; lexicalHits: string[]; graphOnly: string[] } };
@@ -53,6 +54,7 @@ function download(filename: string, contents: string, type: string) {
 
 export default function Home() {
   const [task, setTask] = useState(DEFAULT_TASK);
+  const [repository, setRepository] = useState<RepositoryId>("shopflow");
   const [budget, setBudget] = useState(4_000);
   const [depth, setDepth] = useState(3);
   const [state, setState] = useState<UiState>("idle");
@@ -90,7 +92,7 @@ export default function Home() {
       const response = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ repository: "shopflow", task, budget, depth }),
+        body: JSON.stringify({ repository, task, budget, depth }),
       });
       const body = await response.json() as Analysis | { error: string };
       if (!response.ok || "error" in body) throw new Error("error" in body ? body.error : `Analysis failed with ${response.status}`);
@@ -102,7 +104,7 @@ export default function Home() {
       setState("error");
       setError(cause instanceof Error ? cause.message : String(cause));
     }
-  }, [budget, depth, task]);
+  }, [budget, depth, repository, task]);
 
   useEffect(() => {
     if (!autorunStarted.current && new URLSearchParams(window.location.search).get("autorun") === "1") {
@@ -156,6 +158,16 @@ export default function Home() {
   const selected = analysis?.impact.recommendations.find((item) => item.node.id === selectedId);
   const highRisk = analysis?.impact.recommendations.filter((item) => item.risk === "High").length ?? 0;
   const tests = new Set(analysis?.impact.recommendations.filter((item) => item.isTest).map((item) => item.path)).size;
+  const repositoryInfo = repositoryMetadata(repository);
+
+  function selectRepository(id: RepositoryId) {
+    setRepository(id);
+    setTask(repositoryMetadata(id).defaultTask);
+    setAnalysis(undefined);
+    setSelectedId(undefined);
+    setState("idle");
+    setError("");
+  }
 
   async function copyPack() {
     if (!analysis) return;
@@ -176,7 +188,7 @@ export default function Home() {
           <div className={`connection ${hydraReady === true ? "online" : hydraReady === false ? "offline" : "pending"}`} role="status" aria-live="polite">
             <CircleDot size={13} /> {hydraReady === true ? "HydraDB connected" : hydraReady === false ? "HydraDB unavailable" : "Checking HydraDB"}
           </div>
-          <div className="repo-chip"><GitBranch size={13} /> ShopFlow · {analysis?.index.indexedCommit.slice(0, 7) ?? "not indexed"}</div>
+          <div className="repo-chip"><GitBranch size={13} /> {repositoryInfo.name.replace(" demo", "").replace(" dogfood", "")} · {analysis?.index.indexedCommit.slice(0, 7) ?? "not indexed"}</div>
         </div>
       </header>
 
@@ -192,7 +204,7 @@ export default function Home() {
       </section>
 
       <form className="control-panel" onSubmit={(event) => { event.preventDefault(); void analyze(); }} aria-label="Blast radius analysis controls">
-        <div className="field compact"><label htmlFor="repository">Repository</label><select id="repository" disabled title="The web demo is restricted to the included ShopFlow fixture"><option>ShopFlow demo</option></select></div>
+        <div className="field compact"><label htmlFor="repository">Repository</label><select id="repository" value={repository} onChange={(event) => selectRepository(event.target.value as RepositoryId)} title={repositoryInfo.description}>{REPOSITORY_CATALOG.map((item) => <option value={item.id} key={item.id}>{item.name}</option>)}</select></div>
         <div className="field task-field"><label htmlFor="task">Task or change intent</label><div className="input-icon"><Search size={15} aria-hidden="true" /><input id="task" value={task} onChange={(event) => setTask(event.target.value)} minLength={3} maxLength={500} required autoComplete="off" /></div></div>
         <div className="field compact"><label htmlFor="budget">Token budget</label><select id="budget" value={budget} onChange={(event) => setBudget(Number(event.target.value))}><option value={2000}>2,000</option><option value={4000}>4,000</option><option value={8000}>8,000</option></select></div>
         <div className="field depth"><label htmlFor="depth">Depth</label><select id="depth" value={depth} onChange={(event) => setDepth(Number(event.target.value))}><option value={1}>1 hop</option><option value={2}>2 hops</option><option value={3}>3 hops</option></select></div>
@@ -201,8 +213,8 @@ export default function Home() {
         </button>
       </form>
 
-      {state === "idle" && <section className="empty-state"><Network size={36} /><h2>One click from source change to proven context</h2><p>Run the included coupon scenario to reveal aliased callers, a multi-hop API route, and tests that lexical retrieval misses.</p></section>}
-      {state === "analyzing" && <section className="loading-state" role="status" aria-live="polite" aria-busy="true"><div className="scanline" /><Database size={30} /><h2>Traversing HydraDB</h2><p>Indexing ShopFlow, resolving seeds, and collecting bounded native evidence paths…</p></section>}
+      {state === "idle" && <section className="empty-state"><Network size={36} /><h2>One click from source change to proven context</h2><p>{repository === "shopflow" ? "Run the coupon scenario to reveal aliased callers, a multi-hop API route, and tests that lexical retrieval misses." : "Dogfood mode compiles HydraTrace itself into HydraDB and traces the impact of changing its typed HTTP client."}</p><span className="source-badge">{repositoryInfo.kind}</span></section>}
+      {state === "analyzing" && <section className="loading-state" role="status" aria-live="polite" aria-busy="true"><div className="scanline" /><Database size={30} /><h2>Traversing HydraDB</h2><p>Indexing {repositoryInfo.name}, resolving seeds, and collecting bounded native evidence paths…</p></section>}
       {state === "error" && <section className="error-state" role="alert"><AlertTriangle size={28} /><div><h2>Analysis stopped honestly</h2><p>{error}</p><code>pnpm hydra:up &amp;&amp; pnpm hydra:wait &amp;&amp; pnpm hydra:smoke</code></div></section>}
 
       {analysis && state === "success" && <>

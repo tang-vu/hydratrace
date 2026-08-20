@@ -1,6 +1,6 @@
 {
   "name": "hydratrace",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "Graph-native change impact and context packs for coding agents, powered by HydraDB.",
@@ -24,6 +24,10 @@
     "hydra:smoke": "tsx scripts/hydra-smoke.ts",
     "hydra:down": "docker compose down",
     "cli": "tsx src/cli/index.ts",
+    "mcp": "tsx src/mcp/server.ts",
+    "mcp:verify": "tsx scripts/mcp-verify.ts",
+    "dogfood:verify": "tsx scripts/dogfood-verify.ts",
+    "case-study": "tsx scripts/case-study.ts",
     "doctor": "tsx src/cli/index.ts doctor",
     "demo:index": "tsx src/cli/index.ts index fixtures/shopflow",
     "demo:analyze": "tsx src/cli/index.ts analyze fixtures/shopflow --task \"Change applyCoupon and find checkout callers and tests\" --budget 4000 --depth 3",
@@ -32,6 +36,7 @@
     "demo": "tsx scripts/demo.ts"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "1.30.0",
     "@xyflow/react": "12.11.3",
     "lucide-react": "1.33.0",
     "next": "16.3.1",
