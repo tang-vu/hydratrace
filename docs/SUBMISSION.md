@@ -30,7 +30,7 @@ Track 02 — Repos, dependencies and code as graphs; sub-track B — Code graphs
 
 ## Team members and contributions
 
-- Tang Vu — project concept, product design, architecture, implementation, tests, DevOps, benchmark, documentation, and demo. **Confirm this wording before submission.**
+- Tang Vu — project concept, product design, architecture, implementation, tests, DevOps, benchmark, documentation, and demo.
 
 ## Links
 
@@ -45,4 +45,3 @@ Track 02 — Repos, dependencies and code as graphs; sub-track B — Code graphs
 - Paste the verified video URL and check duration ≤ 3:00.
 - Open README setup links and repository license from the public page.
 - Submit before August 20, 2026, 11:59 PM PT.
-
