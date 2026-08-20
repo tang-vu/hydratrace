@@ -1,0 +1,12 @@
+node_modules/
+.next/
+coverage/
+dist/
+.hydratrace/
+generated/
+*.log
+.env*
+!.env.example
+playwright-report/
+test-results/
+*.tsbuildinfo

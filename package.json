@@ -1,0 +1,54 @@
+{
+  "name": "hydratrace",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Graph-native change impact and context packs for coding agents, powered by HydraDB.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "pnpm@11.20.0",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint . --max-warnings 0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --exclude tests/integration/**",
+    "test:integration": "vitest run tests/integration",
+    "test:e2e": "tsx scripts/browser-verify.ts",
+    "hydra:prepare": "tsx scripts/hydra-prepare.ts",
+    "hydra:up": "docker compose up -d hydradb",
+    "hydra:wait": "tsx scripts/hydra-wait.ts",
+    "hydra:smoke": "tsx scripts/hydra-smoke.ts",
+    "hydra:down": "docker compose down",
+    "cli": "tsx src/cli/index.ts",
+    "doctor": "tsx src/cli/index.ts doctor",
+    "demo:index": "tsx src/cli/index.ts index fixtures/shopflow",
+    "demo:analyze": "tsx src/cli/index.ts analyze fixtures/shopflow --task \"Change applyCoupon and find checkout callers and tests\" --budget 4000 --depth 3",
+    "benchmark": "tsx src/benchmark/index.ts",
+    "demo:verify": "tsx scripts/demo-verify.ts",
+    "demo": "tsx scripts/demo.ts"
+  },
+  "dependencies": {
+    "@xyflow/react": "12.11.3",
+    "lucide-react": "1.33.0",
+    "next": "16.3.1",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "ts-morph": "28.0.0",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.3.1",
+    "playwright-core": "1.62.1",
+    "tsx": "latest",
+    "typescript": "6.0.3",
+    "vitest": "4.1.11"
+  }
+}
