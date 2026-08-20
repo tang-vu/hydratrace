@@ -16,7 +16,7 @@ await runPnpm("hydra:up");
 await runPnpm("hydra:wait");
 await runPnpm("hydra:smoke");
 await runPnpm("demo:verify");
-console.log("Starting HydraTrace at http://127.0.0.1:3000");
+console.log("Starting HydraTrace. Next.js will print the selected local URL.");
 const child = process.platform === "win32"
   ? spawn(process.env.ComSpec ?? "cmd.exe", ["/d", "/s", "/c", "pnpm", "dev"], { stdio: "inherit" })
   : spawn("pnpm", ["dev"], { stdio: "inherit" });
