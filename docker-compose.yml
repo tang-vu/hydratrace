@@ -1,0 +1,56 @@
+name: hydratrace
+
+services:
+  hydradb-init:
+    image: alpine:3.22
+    volumes:
+      - hydradb-data:/data
+    secrets:
+      - hydradb_token
+    command:
+      - /bin/sh
+      - -eu
+      - -c
+      - |
+        mkdir -p /data/store /data/cache
+        cp /run/secrets/hydradb_token /data/auth-token
+        chown -R 10001:10001 /data
+        chmod 600 /data/auth-token
+
+  hydradb:
+    image: ghcr.io/hydra-db/hydradb:latest
+    depends_on:
+      hydradb-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:7687:7687"
+      - "127.0.0.1:8443:8443"
+      - "127.0.0.1:9090:9090"
+    volumes:
+      - hydradb-data:/data
+    environment:
+      CLOUD_PROVIDER: local
+      LOCAL_PATH: /data/store
+      GRAPH_NAMESPACE: hydratrace
+      GRAPH_ID: hydratrace
+      GRAPH_CELL_ID: cell-0
+      GRAPH_CELLS: cell-0
+      GRAPH_NODE_ID: node-0
+      GRAPH_BOLT_NODE_ADDRESSES: node-0=127.0.0.1:7687
+      GRAPH_ADVERTISED_BOLT_ADDR: 127.0.0.1:7687
+      GRAPH_DATA_CACHE_DIR: /data/cache
+      GRAPH_AUTH_TOKEN_FILE: /data/auth-token
+      GRAPH_ALLOW_PLAINTEXT: "true"
+      RUST_MIN_STACK: "33554432"
+    # The upstream image healthcheck invokes wget, which is absent from the
+    # runtime image. Host-side `hydra:wait` and `hydra:smoke` are authoritative.
+    healthcheck:
+      disable: true
+
+volumes:
+  hydradb-data:
+
+secrets:
+  hydradb_token:
+    file: ./.hydratrace/secrets/hydradb-token
