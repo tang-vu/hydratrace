@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { edgeUpsertQuery, graphCountQueries, pathTraversalQuery, vertexUpsertQuery } from "../src/hydradb/queries";
+import {
+  edgeUpsertQuery,
+  graphCountQueries,
+  pathTraversalQuery,
+  rootEdgeCountQuery,
+  rootEdgesDeleteQuery,
+  storedNodeIdsQuery,
+  vertexDeleteQuery,
+  vertexUpsertQuery,
+} from "../src/hydradb/queries";
 
 describe("HydraDB Cypher query contracts", () => {
   it("generates ID-only vertex MERGE followed by explicit SET", () => {
@@ -18,6 +27,13 @@ describe("HydraDB Cypher query contracts", () => {
     expect(query).toContain("resultLimit: 100");
     expect(query).not.toContain("RETURN *");
     expect(() => pathTraversalQuery(4)).toThrow(/depth/);
+  });
+
+  it("generates root-scoped stale-record discovery and typed batch deletion", () => {
+    expect(storedNodeIdsQuery("Symbol")).toBe("MATCH (n:Symbol {rootHash: $rootHash}) RETURN n.id AS id");
+    expect(rootEdgesDeleteQuery("CALLS")).toBe("MATCH (a)-[r:CALLS {rootHash: $rootHash}]->(b) DELETE r");
+    expect(rootEdgeCountQuery("CALLS")).toBe("MATCH (a)-[r:CALLS {rootHash: $rootHash}]->(b) RETURN count(*) AS itemCount");
+    expect(vertexDeleteQuery()).toBe("UNWIND $rows AS row MATCH (n {id: row.id}) DETACH DELETE n");
   });
 
   it("counts only explicitly labelled nodes and typed relationships", () => {

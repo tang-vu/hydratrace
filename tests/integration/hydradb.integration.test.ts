@@ -5,7 +5,7 @@ import { indexRepository } from "../../src/core/indexer";
 import { HydraDbClient, HydraDbError } from "../../src/hydradb/client";
 import { loadHydraConfig } from "../../src/hydradb/config";
 import { ingestRepository } from "../../src/hydradb/ingest";
-import { pathTraversalQuery } from "../../src/hydradb/queries";
+import { graphCountQueries, pathTraversalQuery } from "../../src/hydradb/queries";
 
 describe.sequential("live HydraDB integration (no fallback)", () => {
   const config = loadHydraConfig();
@@ -37,6 +37,9 @@ describe.sequential("live HydraDB integration (no fallback)", () => {
     expect(first.edgeCount).toBe(57);
     expect(second.nodeCount).toBe(first.nodeCount);
     expect(second.edgeCount).toBe(first.edgeCount);
+    expect(second.synchronized).toBe(true);
+    expect(second.deletedNodeCount).toBe(0);
+    expect(second.replacedEdgeCount).toBe(first.edgeCount);
     expect(second.batches.every((batch) => batch.bookmark)).toBe(true);
     let persistedNodes = 0;
     for (const label of NODE_LABELS) {
@@ -58,6 +61,36 @@ describe.sequential("live HydraDB integration (no fallback)", () => {
     }
     expect(persistedNodes).toBe(first.nodeCount);
     expect(persistedEdges).toBe(first.edgeCount);
+  });
+
+  it("removes stale repository records and restores them on the next full index", async () => {
+    const full = await indexRepository("fixtures/shopflow");
+    const removed = full.nodes.find((node) => node.label === "Symbol" && node.properties.name === "applyCoupon")!;
+    const reduced = {
+      ...full,
+      indexedAt: new Date(Date.now() + 1).toISOString(),
+      nodes: full.nodes.filter((node) => node.id !== removed.id),
+      edges: full.edges.filter((item) => item.source !== removed.id && item.target !== removed.id),
+    };
+    const receipt = await ingestRepository(client, reduced);
+    expect(receipt.synchronized).toBe(true);
+    expect(receipt.deletedNodeCount).toBe(1);
+    expect(receipt.replacedEdgeCount).toBe(full.edges.length);
+    const missing = await client.query("MATCH (n:Symbol {id: $id}) RETURN count(*) AS itemCount", {
+      queryId: `${prefix}-stale-node-missing`, parameters: { id: removed.id }, consistency: "causal",
+    });
+    expect(missing.rows).toEqual([[0]]);
+    const reducedEdgeCount = await client.query(graphCountQueries().edges, {
+      queryId: `${prefix}-stale-edge-cardinality`, parameters: { rootHash: full.rootHash }, consistency: "causal",
+    });
+    expect(reducedEdgeCount.rows.reduce((sum, row) => sum + Number(row[0] ?? 0), 0)).toBe(reduced.edges.length);
+
+    const restored = { ...full, indexedAt: new Date(Date.now() + 2).toISOString() };
+    await ingestRepository(client, restored);
+    const present = await client.query("MATCH (n:Symbol {id: $id}) RETURN count(*) AS itemCount", {
+      queryId: `${prefix}-stale-node-restored`, parameters: { id: removed.id }, consistency: "causal",
+    });
+    expect(present.rows).toEqual([[1]]);
   });
 
   it("returns bounded whole paths from the native procedure", async () => {

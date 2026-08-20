@@ -26,6 +26,22 @@ export function edgeUpsertQuery(type: EdgeType, sourceLabel: NodeLabel, targetLa
   return `UNWIND $rows AS row MATCH (s:${safeSourceLabel} {id: row.source}), (d:${safeTargetLabel} {id: row.target}) MERGE (s)-[r:${safeType} {id: row.id}]->(d)${assignments ? ` SET ${assignments}` : ""}`;
 }
 
+export function storedNodeIdsQuery(label: NodeLabel): string {
+  return `MATCH (n:${identifier(label)} {rootHash: $rootHash}) RETURN n.id AS id`;
+}
+
+export function vertexDeleteQuery(): string {
+  return "UNWIND $rows AS row MATCH (n {id: row.id}) DETACH DELETE n";
+}
+
+export function rootEdgesDeleteQuery(type: EdgeType): string {
+  return `MATCH (a)-[r:${identifier(type)} {rootHash: $rootHash}]->(b) DELETE r`;
+}
+
+export function rootEdgeCountQuery(type: EdgeType): string {
+  return `MATCH (a)-[r:${identifier(type)} {rootHash: $rootHash}]->(b) RETURN count(*) AS itemCount`;
+}
+
 export function pathTraversalQuery(depth: number, pathCount = 100): string {
   if (!Number.isInteger(depth) || depth < 1 || depth > 3) throw new Error("Traversal depth must be an integer from 1 to 3.");
   if (!Number.isInteger(pathCount) || pathCount < 1 || pathCount > 200) throw new Error("Path count must be between 1 and 200.");
