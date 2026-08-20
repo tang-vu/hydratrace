@@ -39,6 +39,27 @@ SET r.confidence = row.confidence
 
 The production builder never sends a label, type, or property identifier derived from user text.
 
+## Re-index lifecycle
+
+HydraDB mutation IDs are idempotency keys, not merely log labels. Every indexing run therefore creates a meaningful per-run query-ID suffix while a retry of the same HTTP operation retains its original ID.
+
+To prevent deleted or moved source from leaving phantom impact paths, HydraTrace uses a repairable replace sequence:
+
+1. upsert all current nodes in uniform `UNWIND` batches;
+2. count and delete existing relationships for the repository `rootHash`, one closed-enum type at a time;
+3. query stored node IDs by label/root hash and `DETACH DELETE` only IDs absent from the current index;
+4. upsert all current typed relationships in uniform batches.
+
+HydraDB's current runtime does not reliably project relationship properties for stale-ID discovery, so HydraTrace truthfully reports `replacedEdgeCount` instead of claiming to distinguish stale edge IDs. Repository-specific IDs make the generic node deletion batch safe across co-located repositories.
+
+```cypher
+MATCH (a)-[r:CALLS {rootHash: $rootHash}]->(b) DELETE r
+```
+
+```cypher
+UNWIND $rows AS row MATCH (n {id: row.id}) DETACH DELETE n
+```
+
 ## Traversal
 
 HydraTrace executes one bounded native traversal per seed because numeric IDs are the stable selector and current `MSpaths` selectors are literal/index-oriented.

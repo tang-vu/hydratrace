@@ -35,3 +35,4 @@ Reports are regenerated at `generated/benchmark/report.json` and `.md`; the Mark
 
 This is a small product demonstration, not a statistically representative code-retrieval study. Gold labels and source are authored together, K differs by task breadth, token counts are approximate, caches and local load affect timing, and one repository cannot measure language/ecosystem generalization. The high lexical precision reflects its intentionally narrow result sets; HydraDB improves recall by returning more structural context, with lower precision at the chosen K.
 
+For one validation outside the authored fixture, `pnpm case-study` checks out an unmodified, pinned open-source repository and generates [the p-limit case-study report](CASE_STUDY.md). It is reported separately because one manually labelled scenario does not expand the fixture benchmark into a broad scientific evaluation.

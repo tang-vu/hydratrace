@@ -6,6 +6,8 @@ HydraTrace is a graph-native change-impact and context compiler. It maps a TypeS
 
 Filename search can find `applyCoupon`. HydraTrace also finds the aliased pricing caller, the purchase service, the checkout route, and tests that never mention coupons—and shows the graph path proving every result.
 
+The same verified pipeline is available to coding agents through two local MCP tools, and the web demo can switch from the deterministic ShopFlow story to HydraTrace analyzing its own production source.
+
 ![HydraTrace live ShopFlow analysis showing HydraDB graph evidence, ranked impact, and retrieval metrics](public/hydratrace-demo.png)
 
 ## Run the complete demo
@@ -29,6 +31,7 @@ If port `3000` is occupied, Next.js prints the alternate port it selected. Stop 
 4. Native `algo.SSpaths` traversal returns whole one-to-three-hop paths from HydraDB.
 5. A deterministic score ranks production callers, contracts, and tests.
 6. The Context Pack hydrates only those returned IDs with bounded local snippets, staying within 2K, 4K, or 8K estimated tokens.
+7. A stdio MCP server returns that same bounded pack and structured evidence directly to a coding agent.
 
 ```mermaid
 flowchart LR
@@ -64,6 +67,12 @@ Nodes are `Repository`, `File`, `Symbol`, and `ChangeSet`. Relationships are `CO
 
 The graph retrieves far more structurally relevant files, while the narrower lexical result set is more precise. The local-config case ties, preserving a case where graph expansion adds no value. This synthetic fixture demonstrates product behavior; it is not a claim about general repository performance. See [methodology](docs/BENCHMARK.md) and [executed results](docs/BENCHMARK_RESULTS.md).
 
+## External validation and dogfood
+
+`pnpm case-study` fetches the unmodified MIT-licensed `sindresorhus/p-limit` repository at pinned commit `df476048d023`, indexes it into HydraDB, and regenerates an auditable [external case-study report](docs/CASE_STUDY.md). On the executed four-file `limitFunction` scenario, graph Recall@10 was 100% versus 50% for lexical retrieval, with both runtime and type tests discovered structurally. This is a single pinned case study, not a general benchmark claim.
+
+`pnpm dogfood:verify` indexes HydraTrace itself and asserts that changing `HydraDbClient.query` reaches the API status route, CLI doctor, impact engine, ingestion pipeline, and client tests through real HydraDB evidence paths. The web selector exposes the same allowlisted dogfood path without accepting arbitrary browser-supplied filesystem locations.
+
 ## Five-minute setup, step by step
 
 ```bash
@@ -94,6 +103,15 @@ pnpm benchmark
 
 Diff mode uses read-only `git diff --unified=0 --find-renames`. Added, modified, renamed, and deleted files are represented honestly; Context Packs record base/head refs and bounded diff hunks before graph-expanded source context. Task mode deterministically ranks exact names, qualified names, quoted text, paths, and token overlap; low-confidence seeds are labelled rather than overstated. Diff seeds outrank task seeds when both are supplied.
 
+## MCP for coding agents
+
+```bash
+pnpm mcp:verify
+codex mcp add hydratrace -- pnpm --dir /absolute/path/to/hydratrace mcp
+```
+
+The server exposes `get_change_context` and `explain_symbol_impact`. Verification performs a real stdio MCP handshake and invokes both tools; it does not call internal functions as a substitute for protocol testing. See [MCP setup and trust boundaries](docs/MCP.md).
+
 ## Verification
 
 ```bash
@@ -101,22 +119,26 @@ pnpm lint
 pnpm typecheck
 pnpm test
 pnpm test:integration
+pnpm mcp:verify
+pnpm dogfood:verify
+pnpm case-study
 pnpm build
+pnpm test:e2e
 pnpm benchmark
 pnpm demo:verify
 ```
 
-Live integration tests cover authenticated write/read, bookmarks, batched idempotent upserts, native paths, malformed queries, invalid authentication, and the explicit no-fallback failure. CI runs the same checks with the official container.
+Live integration tests cover authenticated write/read, bookmarks, batched idempotent upserts, stale-record synchronization, native paths, malformed queries, invalid authentication, and the explicit no-fallback failure. CI runs the submission-critical checks with the official container.
 
 ## Security and honest boundaries
 
-- The web API only indexes the bundled ShopFlow fixture; it does not accept arbitrary filesystem paths.
+- The web API resolves only two server-owned IDs: bundled ShopFlow and the HydraTrace checkout itself. It never accepts a browser-supplied filesystem path.
 - Source hydration resolves real paths and rejects anything outside the requested repository root. Symlinks are excluded during discovery.
 - Task text never enters Cypher; all values are parameterized and labels/types come from fixed enums.
 - Bearer tokens are file-backed, gitignored, and redacted from errors.
 - TypeScript and JavaScript only. Static analysis can miss dynamic dispatch, reflection, runtime module loading, and ambiguous overloads.
 - Traversal is deliberately bounded to three hops and 100 paths per seed.
-- Upserts are idempotent, but this hackathon build does not garbage-collect stale graph records after files are removed.
+- Re-indexing upserts current nodes, replaces repository-scoped typed relationships, and deletes stale nodes before restoring current edges. Per-run mutation IDs avoid HydraDB deduplication preventing a later repair.
 - Deleted files may map only to a file-level seed when their prior symbol metadata is unavailable.
 - Token counts use the documented characters-divided-by-four estimate.
 

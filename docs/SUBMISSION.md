@@ -14,15 +14,15 @@ Coding agents usually retrieve files by filename, keywords, embeddings, or recen
 
 ## What was built
 
-HydraTrace includes a semantic TypeScript/JavaScript indexer, deterministic safe graph identities, batched HydraDB ingestion, Git diff and natural-language seeding, native bounded path traversal, auditable risk ranking, evidence-oriented recommendations, Markdown/JSON Context Packs, a lexical comparison and seven-case executed benchmark, CLI/doctor workflow, live Next.js graph interface, integration tests, and a deterministic ShopFlow demo.
+HydraTrace includes a semantic TypeScript/JavaScript indexer, deterministic safe graph identities, synchronized batched HydraDB ingestion, Git diff and natural-language seeding, native bounded path traversal, auditable risk ranking, evidence-oriented recommendations, Markdown/JSON Context Packs, a lexical comparison and seven-case executed benchmark, a pinned external p-limit case study, CLI/doctor workflow, two verified MCP tools for coding agents, a live Next.js graph interface with ShopFlow and HydraTrace dogfood modes, integration tests, and a deterministic demo.
 
 ## How HydraDB is used
 
-HydraDB stores the repository’s `Repository`, `File`, and `Symbol` nodes plus typed structural relationships. HydraTrace carries mutation bookmarks into causal reads and calls native `algo.SSpaths` to retrieve whole one-to-three-hop evidence paths. The live UI shows sanitized Cypher, query IDs, latency, path count, read epoch, and bookmark state. Source snippets are hydrated locally only after HydraDB returns the relevant IDs. There is intentionally no production graph fallback, so HydraDB is required for the core result.
+HydraDB stores the repository’s `Repository`, `File`, `Symbol`, and `ChangeSet` nodes plus typed structural relationships. HydraTrace carries mutation bookmarks into causal reads, synchronizes removed source, and calls native `algo.SSpaths` to retrieve whole one-to-three-hop evidence paths. The live UI and MCP output expose sanitized query IDs, latency, result count, read epoch, and bookmark state. Source snippets are hydrated locally only after HydraDB returns the relevant IDs. There is intentionally no production graph fallback, so HydraDB is required for the core result.
 
 ## Tech stack
 
-TypeScript 6, Node.js 24, Next.js 16, React 19, ts-morph, HydraDB HTTP API/OpenCypher/native path procedures, React Flow, Zod, Vitest, pnpm, Docker Compose, and GitHub Actions.
+TypeScript 6, Node.js 24, Next.js 16, React 19, ts-morph, HydraDB HTTP API/OpenCypher/native path procedures, Model Context Protocol SDK, React Flow, Zod, Vitest, Playwright, pnpm, Docker Compose, and GitHub Actions.
 
 ## Track
 
@@ -37,6 +37,7 @@ Track 02 — Repos, dependencies and code as graphs; sub-track B — Code graphs
 - Public repository: https://github.com/tang-vu/hydratrace
 - Deployed project: not required; local Docker demo documented in README
 - Demo video: **PASTE UNLISTED YOUTUBE URL HERE**
+- Official submission form: https://forms.gle/WEwqEmmN7Bkp4HyJ6
 
 ## Final form checklist
 

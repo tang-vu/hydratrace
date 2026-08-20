@@ -10,6 +10,7 @@ pnpm hydra:prepare
 pnpm hydra:up
 pnpm hydra:wait
 pnpm hydra:smoke
+pnpm mcp:verify
 pnpm benchmark
 pnpm demo:verify
 pnpm dev
@@ -21,16 +22,17 @@ Confirm the UI status says **HydraDB connected**, the default task is `Change ap
 
 | Time | Screen action | Narration |
 |---|---|---|
-| 0:00–0:18 | Show title and default task. | “Coding agents find textually similar code, but routinely miss structurally connected callers, tests, and configuration. That is how a small edit creates a large surprise.” |
-| 0:18–0:34 | Point to AST → HydraDB → Context Pack strip. | “HydraTrace turns a TypeScript repository into a HydraDB code graph and shows the blast radius before an agent edits.” |
-| 0:34–0:52 | Show connected status, indexed commit, then terminal `pnpm demo:index` output if composited. | “The bundled ShopFlow repository produces 29 deterministic nodes and 57 typed edges. They are written to the official HydraDB container in label- and type-grouped batches.” |
-| 0:52–1:07 | Highlight task and click **Analyze blast radius** once. | “I’m changing `applyCoupon` rounding. HydraTrace selects the exact symbol as the seed—without an LLM.” |
-| 1:07–1:42 | Wait for results, click `calculateOrderTotal`, then `finalizePurchase`, then `checkoutRoute`. | “HydraDB returns whole bounded paths. Here is the aliased pricing caller, then the purchase service, then the API route three hops away. Every arrow is typed and oriented from stored graph evidence.” |
-| 1:42–2:02 | Click `tests/pricing.spec.ts`; show selected evidence. | “It also finds this pricing test structurally, even though the task never names that file. The score is deterministic: path length, dependency type, public surface, test value, and independent evidence.” |
-| 2:02–2:20 | Scroll to retrieval comparison. | “On the executed gold-labeled case, graph recall is 83 percent versus 17 percent for lexical retrieval. Across seven fixture cases it is 95.2 versus 42.9 percent; lexical remains more precise.” |
-| 2:20–2:36 | Show Context Pack budget bar, preview, and click **MD**. | “HydraTrace packs only ranked snippets into a 4,000-token budget, with risk, reason, and evidence attached. The agent gets less context, but the right context.” |
-| 2:36–2:44 | Show HydraDB proof receipt. | “This receipt is live: native `algo.SSpaths`, query ID, latency, returned paths, causal bookmark, and read epoch.” |
-| 2:44–2:48 | Return to graph/title. | “HydraTrace: see the blast radius before your coding agent edits.” |
+| 0:00–0:15 | Show title and default task. | “Coding agents find similar code, but routinely miss structurally connected callers, tests, and configuration. That is how a small edit creates a large surprise.” |
+| 0:15–0:30 | Point to AST → HydraDB → Context Pack strip. | “HydraTrace turns a TypeScript repository into a HydraDB code graph and shows the blast radius before an agent edits.” |
+| 0:30–0:46 | Show connected status, repository selector, and `pnpm demo:index` output if composited. | “ShopFlow produces 29 deterministic nodes and 57 typed edges in the official HydraDB container. The second selector is dogfood: HydraTrace can analyze itself.” |
+| 0:46–1:00 | Highlight task and click **Analyze blast radius** once. | “I’m changing `applyCoupon` rounding. HydraTrace selects the exact symbol as the seed—without an LLM.” |
+| 1:00–1:34 | Wait for results, click `calculateOrderTotal`, `finalizePurchase`, then `checkoutRoute`. | “HydraDB returns whole bounded paths: the aliased pricing caller, purchase service, and API route three hops away. Every arrow is typed and oriented from stored graph evidence.” |
+| 1:34–1:52 | Click `tests/pricing.spec.ts`; show selected evidence. | “It also finds this test structurally, although the task never names the file. Ranking is deterministic: path length, edge type, public surface, test value, and independent evidence.” |
+| 1:52–2:10 | Scroll to retrieval comparison. | “On this executed case, graph recall is 83 percent versus 17 percent for lexical. Across seven fixture cases it is 95.2 versus 42.9; lexical remains more precise.” |
+| 2:10–2:27 | Show Context Pack budget bar and click **MD**. | “HydraTrace packs only ranked snippets into 4,000 tokens, with risk, reason, and proof attached. Less context, but the right context.” |
+| 2:27–2:39 | Show HydraDB proof receipt. | “The receipt is live: native `algo.SSpaths`, query ID, latency, results, causal bookmark, and read epoch.” |
+| 2:39–2:50 | Cut to the pre-run `pnpm mcp:verify` output. | “A real MCP handshake exposes this same context through `get_change_context` and `explain_symbol_impact`, directly to coding agents.” |
+| 2:50–2:54 | Return to graph/title. | “HydraTrace: see the blast radius before your coding agent edits.” |
 
 ## Expected output
 
@@ -43,4 +45,3 @@ Before recording, capture one full-results screenshot and one close crop of the 
 ## Recording and upload
 
 Record 1440p at 30 fps, export H.264, and keep the final cut under three minutes. Check that small query text is legible at 1080p playback and that no token file, terminal secret, personal notification, or unrelated repository is visible. Upload to YouTube as **Unlisted**, open the link in a private window, confirm playback without authentication, and paste the URL into `docs/SUBMISSION.md` and the official form.
-
