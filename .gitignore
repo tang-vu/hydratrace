@@ -10,3 +10,7 @@ generated/
 playwright-report/
 test-results/
 *.tsbuildinfo
+
+# Local coding-agent instructions; keep them on the workstation, not in product commits.
+AGENTS.md
+CLAUDE.md
