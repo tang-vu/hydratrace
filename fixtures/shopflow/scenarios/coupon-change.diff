@@ -1,0 +1,7 @@
+diff --git a/src/pricing/coupon.ts b/src/pricing/coupon.ts
+index 1111111..2222222 100644
+--- a/src/pricing/coupon.ts
++++ b/src/pricing/coupon.ts
+@@ -17,1 +17,1 @@ export function applyCoupon(order: OrderDraft): number {
+-  const rate = order.couponCode ? (CAMPAIGNS[order.couponCode] ?? 0) : 0;
++  const rate = order.couponCode ? (CAMPAIGNS[order.couponCode] ?? 0) : 0;
