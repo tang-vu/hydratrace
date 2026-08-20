@@ -36,13 +36,13 @@ Track 02 — Repos, dependencies and code as graphs; sub-track B — Code graphs
 
 - Public repository: https://github.com/tang-vu/hydratrace
 - Live project: https://hydratrace.tangvu.dev
-- Demo video: **PASTE UNLISTED YOUTUBE URL HERE**
+- Demo video (2:29, unlisted): https://youtu.be/JQmdZOLgzaA
 - Official submission form: https://forms.gle/WEwqEmmN7Bkp4HyJ6
 
 ## Final form checklist
 
 - Confirm repository visibility in a signed-out browser.
 - Confirm every participant and contribution line.
-- Paste the verified video URL and check duration ≤ 3:00.
+- Open the verified 2:29 video URL in a signed-out browser before final submission.
 - Open README setup links and repository license from the public page.
 - Submit before August 20, 2026, 11:59 PM PT.

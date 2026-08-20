@@ -10,6 +10,8 @@ The same verified pipeline is available to coding agents through two local MCP t
 
 **Live demo:** [hydratrace.tangvu.dev](https://hydratrace.tangvu.dev) — a production Next.js process connected to the real local HydraDB container through a dedicated Cloudflare Tunnel. The public API has no fallback graph and accepts only the two server-owned repository IDs shown in the interface.
 
+**Three-minute video:** [Watch the Hack Hydra 2026 submission on YouTube](https://youtu.be/JQmdZOLgzaA).
+
 ![HydraTrace live ShopFlow analysis showing HydraDB graph evidence, ranked impact, and retrieval metrics](public/hydratrace-demo.png)
 
 The reproducible [three-minute demo script](docs/DEMO_SCRIPT.md) and [verified video-production pipeline](docs/VIDEO_PRODUCTION.md) capture only live HydraDB-backed results. Generated media and production credentials remain local and ignored.
